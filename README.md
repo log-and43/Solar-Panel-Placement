@@ -86,12 +86,3 @@ npm run dev
 ```
 
 Open http://localhost:5173, pick WA → Whatcom County (or Bellingham), click Run.
-
-## Suggested initial commits
-
-1. `chore: scaffold backend + frontend + docs` — everything in this drop
-2. `docs: phase plan and API contract` — the docs/ files specifically
-3. `feat(backend): /analyze endpoint with Phase 1 fake data`
-4. `feat(frontend): region picker, map, diagnostic, caveats`
-
-Or just squash to one initial commit. Up to you.
