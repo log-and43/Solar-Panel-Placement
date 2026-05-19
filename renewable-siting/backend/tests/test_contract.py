@@ -20,7 +20,10 @@ client = TestClient(app)
 def test_health() -> None:
     r = client.get("/health")
     assert r.status_code == 200
-    assert r.json() == {"status": "ok", "phase": 1}
+    data = r.json()
+    assert data["status"] == "ok"
+    assert data["phase"] in (1, 2)
+    assert isinstance(data["data_built"], bool)
 
 
 def test_regions_list() -> None:
@@ -98,9 +101,8 @@ def test_analyze_whatcom_response_shape() -> None:
     assert econ["co2_avoided_tons_per_year"] >= 0
     # payback_years can be None if savings == 0
 
-    # Caveats — Phase 1 MUST include the "placeholder" caveat
-    assert any("PHASE 1" in c for c in data["caveats"]), \
-        "Phase 1 response must label itself as placeholder data"
+    # Caveats — must always include at least one placeholder/limitation note
+    assert len(data["caveats"]) > 0, "response must always include caveats"
 
 
 def test_bellingham_is_smaller_than_whatcom() -> None:

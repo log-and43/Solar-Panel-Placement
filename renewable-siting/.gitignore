@@ -20,3 +20,6 @@ dist/
 # Local env
 .env
 .env.local
+
+# Phase 2: raw downloads aren't committed; the built Parquet files ARE.
+backend/data/raw/

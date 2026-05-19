@@ -7,10 +7,13 @@ coastal regions — offshore wind, and reports the gap between current fossil
 generation and what renewables could cover, along with cost, payback, and
 CO₂ estimates.
 
-**Status: Phase 1 — Walking skeleton.** The full pipeline runs end-to-end
-with hardcoded data for Bellingham / Whatcom County, WA. No real data sources
-are wired up yet. The frontend, backend, API contract, and map rendering
-all work; subsequent phases replace each piece of fake data with a real one.
+**Status: Phase 2 — real consumption data.** The /analyze pipeline now
+uses real consumption numbers from EIA SEDS + EPA eGRID + Census ACS for
+~3,000 US counties and ~3,000 cities (≥ 10,000 population). Polygons,
+cost estimates, and recommendation logic are still Phase 1 placeholders;
+they're scheduled for Phases 3, 4, 6, and 7. The API contract is unchanged.
+
+See `docs/PHASE_2.md` for what to run to enable Phase 2 data.
 
 ## Why a walking skeleton first
 
@@ -86,3 +89,4 @@ npm run dev
 ```
 
 Open http://localhost:5173, pick WA → Whatcom County (or Bellingham), click Run.
+

@@ -4,9 +4,24 @@
 
 const BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'
 
-export async function listRegions() {
-  const r = await fetch(`${BASE}/regions`)
-  if (!r.ok) throw new Error(`GET /regions ${r.status}`)
+export async function listStates() {
+  const r = await fetch(`${BASE}/states`)
+  if (!r.ok) throw new Error(`GET /states ${r.status}`)
+  return r.json()
+}
+
+export async function searchRegions({ regionType, state, q, limit = 25 }) {
+  const params = new URLSearchParams({ region_type: regionType, limit: String(limit) })
+  if (state) params.set('state', state)
+  if (q) params.set('q', q)
+  const r = await fetch(`${BASE}/search?${params.toString()}`)
+  if (!r.ok) throw new Error(`GET /search ${r.status}`)
+  return r.json()
+}
+
+export async function getHealth() {
+  const r = await fetch(`${BASE}/health`)
+  if (!r.ok) throw new Error(`GET /health ${r.status}`)
   return r.json()
 }
 

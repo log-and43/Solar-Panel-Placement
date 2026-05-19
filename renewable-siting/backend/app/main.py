@@ -12,14 +12,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from .pipeline import RegionNotFound, analyze
-from .regions import list_available
+from .regions import list_available, list_states, search
 from .schemas import AnalyzeRequest, AnalyzeResponse
 
 
 app = FastAPI(
     title="Renewable Siting Tool",
-    description="Phase 1 walking skeleton. See docs/CONTRACT.md.",
-    version="0.1.0",
+    description="Phase 2 — real consumption data. See docs/CONTRACT.md.",
+    version="0.2.0",
 )
 
 # Dev CORS: permissive for now. Lock down before any deploy.
@@ -33,13 +33,42 @@ app.add_middleware(
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "phase": 1}
+    from .data_store import data_available
+    return {
+        "status": "ok",
+        "phase": 2 if data_available() else 1,
+        "data_built": data_available(),
+    }
 
 
 @app.get("/regions")
 def regions() -> list[dict]:
-    """List regions the picker can offer. Phase 1: two entries."""
+    """Legacy Phase-1 endpoint. Frontend now uses /search and /states."""
     return list_available()
+
+
+@app.get("/states")
+def states_endpoint() -> list[dict]:
+    """All states with data. Powers the state dropdown in the picker."""
+    return list_states()
+
+
+@app.get("/search")
+def search_endpoint(
+    region_type: str,
+    q: str = "",
+    state: str | None = None,
+    limit: int = 25,
+) -> list[dict]:
+    """
+    Typeahead search.
+    Query params:
+      region_type: 'county' or 'city' (required)
+      q:           substring (empty → top results in state, by population)
+      state:       2-letter state abbr; if None, search all states
+      limit:       max results (default 25)
+    """
+    return search(state=state, region_type=region_type, query=q, limit=limit)
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)
