@@ -1,122 +1,78 @@
-import { fmtMWh, fmtUSD, fmtTons, fmtYears, fmtPct } from '../lib/format.js'
+import { fmtUSD, fmtTons, fmtYears } from '../lib/format.js'
 
-function MixBar({ mix }) {
-  // Order matters for stacked bar readability.
-  const order = ['coal', 'natural_gas', 'nuclear', 'hydro', 'wind', 'solar', 'other']
-  const colors = {
-    coal: '#1f2937',
-    natural_gas: '#9ca3af',
-    nuclear: '#eab308',
-    hydro: '#0ea5e9',
-    wind: '#22c55e',
-    solar: '#f97316',
-    other: '#cbd5e1',
-  }
+// 4-card diagnostic strip, adapted from the Codex frontend layout.
+// Sits below the map. Reads from the AnalyzeResponse plus the user's
+// energy-target override.
+
+function Card({ label, value, sub }) {
   return (
-    <div className="space-y-1">
-      <div className="flex h-3 rounded overflow-hidden">
-        {order.map((k) => (
-          mix[k] > 0 ? (
-            <div
-              key={k}
-              style={{ width: `${mix[k] * 100}%`, backgroundColor: colors[k] }}
-              title={`${k}: ${fmtPct(mix[k])}`}
-            />
-          ) : null
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-600">
-        {order.filter(k => mix[k] > 0).map((k) => (
-          <span key={k} className="flex items-center gap-1">
-            <span className="inline-block w-2 h-2 rounded-sm" style={{ backgroundColor: colors[k] }} />
-            {k.replace('_', ' ')} {fmtPct(mix[k])}
-          </span>
-        ))}
-      </div>
-    </div>
+    <article className="border border-line rounded-lg bg-panel p-4">
+      <span className="text-[11px] uppercase tracking-wide text-muted">{label}</span>
+      <strong className="block text-2xl my-1.5 text-text">{value}</strong>
+      <p className="text-xs text-muted leading-snug">{sub}</p>
+    </article>
   )
 }
 
-function Stat({ label, value, sub }) {
-  return (
-    <div className="bg-slate-50 rounded p-3">
-      <div className="text-xs text-slate-500 uppercase tracking-wide">{label}</div>
-      <div className="text-xl font-semibold text-slate-800">{value}</div>
-      {sub && <div className="text-xs text-slate-500 mt-1">{sub}</div>}
-    </div>
-  )
-}
-
-export default function Diagnostic({ result }) {
+export default function Diagnostic({ result, energyTargetGwh }) {
   if (!result) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 text-sm text-slate-500">
-        Run a region to see results here.
-      </div>
+      <section className="grid grid-cols-4 gap-3">
+        {['Solar generation', 'Alternative renewable', 'Installation cost', 'CO₂ relief'].map((label) => (
+          <Card key={label} label={label} value="—" sub="Run the model to populate." />
+        ))}
+      </section>
     )
   }
-  const { region, consumption, recommendation, economics } = result
-  const primaryLabel = {
-    solar: 'Solar (rooftop + parking)',
-    wind: 'Onshore wind',
-    offshore_wind: 'Offshore wind',
-    mixed: 'Mixed: solar + wind',
-    insufficient: 'Insufficient — gap remains',
-  }[recommendation.primary] || recommendation.primary
+
+  // The "target" is either the user's override or the region's full fossil load.
+  const fossilGwh = result.consumption.fossil_mwh_per_year / 1000.0
+  const target = energyTargetGwh ?? fossilGwh
+
+  // Solar coverage from rooftop + parking polygons (offshore is wind, counted separately).
+  const solarMwh = (result.polygons?.features ?? [])
+    .filter(f => f.properties.category === 'rooftop' || f.properties.category === 'parking')
+    .reduce((s, f) => s + (f.properties.est_annual_mwh ?? 0), 0)
+  const solarGwh = solarMwh / 1000.0
+  const solarPct = target > 0 ? Math.min(100, (solarGwh / target) * 100) : 0
+  const remainingGwh = Math.max(0, target - solarGwh)
+
+  // Alternative — from recommendation.alternatives + offshore_wind_zone polygons.
+  const altMwh = (result.polygons?.features ?? [])
+    .filter(f => f.properties.category === 'offshore_wind_zone')
+    .reduce((s, f) => s + (f.properties.est_annual_mwh ?? 0), 0)
+  const altGwh = altMwh / 1000.0
+  const altPrimary = result.recommendation?.primary
+  const altLabel = altPrimary === 'offshore_wind' || result.region.is_coastal
+    ? 'Offshore wind'
+    : (result.recommendation?.alternatives?.[0]?.tech ?? 'Not specified')
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 space-y-4">
-      <div>
-        <h2 className="text-lg font-semibold text-slate-800">
-          {region.name}, {region.state}
-        </h2>
-        <p className="text-xs text-slate-500">
-          {region.type === 'county' ? 'County' : 'City'} · {region.is_coastal ? 'coastal' : 'inland'}
-        </p>
-      </div>
-
-      <section>
-        <h3 className="text-sm font-semibold text-slate-700 mb-2">Generation mix (state-derived)</h3>
-        <MixBar mix={consumption.mix} />
-        <p className="text-xs text-slate-500 mt-2">Source: {consumption.source}</p>
-      </section>
-
-      <section className="grid grid-cols-2 gap-2">
-        <Stat label="Annual consumption" value={fmtMWh(consumption.total_mwh_per_year)} />
-        <Stat label="Fossil share" value={fmtMWh(consumption.fossil_mwh_per_year)} sub="to displace" />
-      </section>
-
-      <section className="border-t pt-3">
-        <h3 className="text-sm font-semibold text-slate-700 mb-2">Recommendation</h3>
-        <div className="text-base font-medium text-emerald-700">{primaryLabel}</div>
-        <p className="text-sm text-slate-600 mt-1">{recommendation.notes}</p>
-        <div className="grid grid-cols-2 gap-2 mt-3">
-          <Stat label="Covered" value={fmtMWh(recommendation.covered_mwh_per_year)} />
-          <Stat label="Remaining gap" value={fmtMWh(recommendation.gap_mwh_per_year)} />
-        </div>
-        {recommendation.alternatives?.length > 0 && (
-          <div className="mt-3 space-y-1">
-            <div className="text-xs uppercase text-slate-500 tracking-wide">Alternatives considered</div>
-            {recommendation.alternatives.map((a, i) => (
-              <div key={i} className="text-sm bg-slate-50 rounded p-2">
-                <div className="font-medium">{a.tech.replace('_', ' ')}</div>
-                <div className="text-xs text-slate-600">{a.rationale}</div>
-                <div className="text-xs text-slate-500">Potential: {fmtMWh(a.potential_mwh)}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="border-t pt-3">
-        <h3 className="text-sm font-semibold text-slate-700 mb-2">Economics</h3>
-        <div className="grid grid-cols-2 gap-2">
-          <Stat label="Install cost" value={fmtUSD(economics.install_cost_usd)} />
-          <Stat label="Annual savings" value={fmtUSD(economics.annual_savings_usd)} />
-          <Stat label="Payback" value={fmtYears(economics.payback_years)} />
-          <Stat label="CO₂ avoided" value={fmtTons(economics.co2_avoided_tons_per_year)} sub="per year" />
-        </div>
-      </section>
-    </div>
+    <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+      <Card
+        label="Solar generation"
+        value={`${solarGwh.toFixed(2)} GWh/yr`}
+        sub={`${solarPct.toFixed(0)}% of the ${target.toFixed(2)} GWh fossil offset target.`}
+      />
+      <Card
+        label="Alternative renewable"
+        value={altGwh > 0 ? `${altGwh.toFixed(2)} GWh/yr` : 'Not needed'}
+        sub={
+          remainingGwh > 0
+            ? `Solar leaves ${remainingGwh.toFixed(2)} GWh/yr. Primary alternative: ${altLabel}.`
+            : 'Solar covers the modeled target.'
+        }
+      />
+      <Card
+        label="Installation cost"
+        value={fmtUSD(result.economics.install_cost_usd)}
+        sub={`${fmtYears(result.economics.payback_years)} simple payback at retail rate.`}
+      />
+      <Card
+        label="CO₂ relief"
+        value={fmtTons(result.economics.co2_avoided_tons_per_year)}
+        sub={`Avoided emissions per year, using ${result.region.state}'s grid intensity.`}
+      />
+    </section>
   )
 }

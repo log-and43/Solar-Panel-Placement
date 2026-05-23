@@ -1,13 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 
-// Color by polygon category. Phase 5 may add 'cv_detected_parking' as a
-// visually distinct shade so provenance is visible on the map.
 const STYLES = {
-  rooftop: { color: '#f59e0b', weight: 1, fillColor: '#f59e0b', fillOpacity: 0.55 },
-  parking: { color: '#3b82f6', weight: 1, fillColor: '#3b82f6', fillOpacity: 0.55 },
-  offshore_wind_zone: { color: '#10b981', weight: 1, fillColor: '#10b981', fillOpacity: 0.35 },
-  cv_detected_parking: { color: '#a855f7', weight: 1, fillColor: '#a855f7', fillOpacity: 0.55 },
+  rooftop:             { color: '#67d391', weight: 1, fillColor: '#67d391', fillOpacity: 0.55 },
+  parking:             { color: '#f5c45b', weight: 1, fillColor: '#f5c45b', fillOpacity: 0.55 },
+  offshore_wind_zone:  { color: '#6ea2ff', weight: 1.5, fillColor: '#6ea2ff', fillOpacity: 0.32, dashArray: '6 4' },
+  cv_detected_parking: { color: '#53c7df', weight: 1, fillColor: '#53c7df', fillOpacity: 0.55 },
 }
 
 function styleFor(feature) {
@@ -18,18 +16,16 @@ function styleFor(feature) {
 function onEachFeature(feature, layer) {
   const p = feature.properties || {}
   layer.bindTooltip(
-    `<div class="text-xs">
-       <div><b>${p.category}</b></div>
+    `<div style="font-size:11px;">
+       <div><b style="text-transform:capitalize">${(p.category || '').replace(/_/g, ' ')}</b></div>
        <div>Area: ${p.area_m2?.toFixed?.(0) ?? '?'} m²</div>
-       <div>Est. ${p.est_annual_mwh?.toFixed?.(1) ?? '?'} MWh/yr</div>
+       <div>Est. ${p.est_annual_mwh?.toFixed?.(2) ?? '?'} MWh/yr</div>
        <div>Suitability: ${((p.suitability_score ?? 0) * 100).toFixed(0)}%</div>
-       <div class="text-slate-400 mt-1">${p.source ?? ''}</div>
      </div>`,
     { sticky: true }
   )
 }
 
-// Fits map to region bbox whenever it changes.
 function FitToBbox({ bbox }) {
   const map = useMap()
   useEffect(() => {
@@ -40,26 +36,39 @@ function FitToBbox({ bbox }) {
   return null
 }
 
-export default function ResultMap({ result }) {
-  const center = result?.region?.centroid ?? [48.7519, -122.4787] // Bellingham
-  const polygons = result?.polygons
-  // GeoJSON layer in React-Leaflet caches its data; re-key on region to force refresh.
-  const layerKey = result ? `${result.region.state}-${result.region.type}-${result.region.name}` : 'empty'
+export default function ResultMap({ result, visibleLayers }) {
+  const center = result?.region?.centroid ?? [39.5, -98.35]
+
+  // Filter polygons by the user's layer toggles.
+  const filteredPolygons = useMemo(() => {
+    if (!result?.polygons) return null
+    return {
+      ...result.polygons,
+      features: result.polygons.features.filter(f =>
+        visibleLayers.has(f.properties.category)
+      ),
+    }
+  }, [result, visibleLayers])
+
+  // GeoJSON layer in React-Leaflet caches its data; re-key on region+visibility.
+  const layerKey = result
+    ? `${result.region.state}-${result.region.type}-${result.region.name}-${[...visibleLayers].sort().join(',')}`
+    : 'empty'
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full relative">
       <MapContainer center={center} zoom={11} className="h-full w-full" scrollWheelZoom>
         <TileLayer
           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           attribution='Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
           maxZoom={19}
         />
-        {result && (
+        {result && filteredPolygons && (
           <>
             <FitToBbox bbox={result.region.bbox} />
             <GeoJSON
               key={layerKey}
-              data={polygons}
+              data={filteredPolygons}
               style={styleFor}
               onEachFeature={onEachFeature}
             />
@@ -67,11 +76,11 @@ export default function ResultMap({ result }) {
         )}
       </MapContainer>
 
-      {/* Legend */}
-      <div className="absolute bottom-3 right-3 bg-white/95 rounded-lg shadow px-3 py-2 text-xs space-y-1 z-[1000]">
-        <div className="flex items-center gap-2"><span className="w-3 h-3 bg-rooftop rounded-sm" /> Rooftop</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 bg-parking rounded-sm" /> Parking</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 bg-offshore rounded-sm" /> Offshore wind</div>
+      {/* Dark legend, bottom-left */}
+      <div className="absolute bottom-3 left-3 bg-panel/95 border border-line rounded-md px-3 py-2 text-[11px] space-y-1 z-[500]">
+        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm bg-rooftop" /> Rooftop</div>
+        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm bg-parking" /> Parking</div>
+        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm bg-wind" /> Offshore wind</div>
       </div>
     </div>
   )
