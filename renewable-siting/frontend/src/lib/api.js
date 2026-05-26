@@ -25,6 +25,18 @@ export async function getHealth() {
   return r.json()
 }
 
+export async function getPvwattsStatus() {
+  const r = await fetch(`${BASE}/pvwatts/status`)
+  if (!r.ok) throw new Error(`GET /pvwatts/status ${r.status}`)
+  return r.json()
+}
+
+export async function getPolygonsStatus() {
+  const r = await fetch(`${BASE}/polygons/status`)
+  if (!r.ok) throw new Error(`GET /polygons/status ${r.status}`)
+  return r.json()
+}
+
 export async function analyze({ state, region_type, region_name }) {
   const r = await fetch(`${BASE}/analyze`, {
     method: 'POST',

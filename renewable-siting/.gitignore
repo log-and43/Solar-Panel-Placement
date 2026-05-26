@@ -23,3 +23,9 @@ dist/
 
 # Phase 2: raw downloads aren't committed; the built Parquet files ARE.
 backend/data/raw/
+
+# Phase 3: PVWatts cache accumulates locally; not committed
+backend/data/pvwatts_cache.json
+
+# Phase 4: polygon cache accumulates locally; not committed
+backend/data/polygon_cache/

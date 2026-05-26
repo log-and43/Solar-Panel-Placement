@@ -6,5 +6,9 @@ pytest==8.3.3
 # Phase 2 additions
 pandas>=2.2.3
 pyarrow>=18.0.0
-openpyxl==3.1.5
-us==3.2.0
+openpyxl>=3.1.5
+us>=3.2.0
+# Phase 3 additions
+shapely>=2.0.0
+# Phase 4 additions
+duckdb>=1.1.0

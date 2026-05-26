@@ -90,7 +90,11 @@ class PolygonProperties(BaseModel):
     area_m2: float
     est_annual_mwh: float
     suitability_score: float = Field(..., ge=0.0, le=1.0)
+    # Where did the polygon shape come from? (e.g. "Phase 4 real polygons", "PHASE_1_HARDCODED")
     source: str = Field(default="PHASE_1_HARDCODED")
+    # Where did the est_annual_mwh estimate come from? (e.g. PVWatts vs fallback)
+    # Optional so older callers/tests don't break.
+    generation_source: str | None = None
 
 
 class PolygonFeature(BaseModel):

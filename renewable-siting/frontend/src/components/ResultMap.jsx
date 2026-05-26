@@ -15,12 +15,16 @@ function styleFor(feature) {
 
 function onEachFeature(feature, layer) {
   const p = feature.properties || {}
+  const polySrc = p.source || ''
+  const genSrc = p.generation_source || ''
   layer.bindTooltip(
-    `<div style="font-size:11px;">
+    `<div style="font-size:11px; line-height:1.4;">
        <div><b style="text-transform:capitalize">${(p.category || '').replace(/_/g, ' ')}</b></div>
        <div>Area: ${p.area_m2?.toFixed?.(0) ?? '?'} m²</div>
        <div>Est. ${p.est_annual_mwh?.toFixed?.(2) ?? '?'} MWh/yr</div>
        <div>Suitability: ${((p.suitability_score ?? 0) * 100).toFixed(0)}%</div>
+       ${polySrc ? `<div style="opacity:0.6">Shape: ${polySrc}</div>` : ''}
+       ${genSrc ? `<div style="opacity:0.6">Yield: ${genSrc}</div>` : ''}
      </div>`,
     { sticky: true }
   )

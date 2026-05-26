@@ -12,14 +12,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from .pipeline import RegionNotFound, analyze
+from .polygons import source_status as polygons_status
+from .pvwatts import cache_stats, has_api_key
 from .regions import list_available, list_states, search
 from .schemas import AnalyzeRequest, AnalyzeResponse
 
 
 app = FastAPI(
     title="Renewable Siting Tool",
-    description="Phase 2 — real consumption data. See docs/CONTRACT.md.",
-    version="0.2.0",
+    description="Phase 4 — real polygons from Overture + OSM.",
+    version="0.4.0",
 )
 
 # Dev CORS: permissive for now. Lock down before any deploy.
@@ -77,3 +79,25 @@ def analyze_endpoint(req: AnalyzeRequest) -> AnalyzeResponse:
         return analyze(req)
     except RegionNotFound as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@app.get("/pvwatts/status")
+def pvwatts_status() -> dict:
+    """
+    Diagnostic for the PVWatts integration. Lets the frontend show whether
+    real solar data is active, and lets ops see how warm the cache is.
+    """
+    stats = cache_stats()
+    return {
+        "api_key_configured": has_api_key(),
+        "cache": stats,
+    }
+
+
+@app.get("/polygons/status")
+def polygons_status_endpoint() -> dict:
+    """
+    Diagnostic for the Phase 4 polygon sources. Reports whether the
+    Overture stack is installed and how many regions are cached.
+    """
+    return polygons_status()
