@@ -13,6 +13,7 @@ from shapely.geometry import shape
 
 from .consumption import consumption_caveats, real_consumption
 from .data_store import data_available
+from .economics import real_economics
 from .fakes import (
     PHASE_1_CAVEATS,
     fake_consumption,
@@ -57,7 +58,7 @@ PVWATTS_REAL_CAVEAT = (
 PVWATTS_FALLBACK_CAVEAT = (
     "Solar generation per polygon: approximation (area × 0.15 MWh/m²). "
     "To use real NREL PVWatts data, add PVWATTS_API_KEY to backend/.env "
-    "(free key at https://developer.nrel.gov/signup/)."
+    "(free key at https://developer.nlr.gov/signup/)."
 )
 
 
@@ -172,9 +173,21 @@ def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     recommendation = fake_recommendation(          # → Phase 6
         record, consumption, polygons,
     )
-    economics = fake_economics(                    # → Phase 7
-        consumption, polygons, recommendation,
-    )
+
+    # Phase 7: real economics (cost from NREL ATB, savings from EIA state
+    # retail rate, CO2 from eGRID-derived grid intensity). Needs the real
+    # generation mix, so it requires Phase 2 data; otherwise fall back.
+    if data_available():
+        economics, econ_sources = real_economics(consumption, polygons, record.state)
+        caveats.append(
+            "Economics: install cost from NREL ATB 2024 ($1.30/W commercial PV); "
+            "bill savings from EIA state commercial retail rate; CO₂ avoided from "
+            "grid intensity derived from the EPA eGRID generation mix. Simple "
+            "payback ignores financing, incentives, degradation, and rate inflation."
+        )
+    else:
+        economics = fake_economics(consumption, polygons, recommendation)
+        econ_sources = None
 
     return AnalyzeResponse(
         region=region,
@@ -182,6 +195,7 @@ def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         polygons=polygons,
         recommendation=recommendation,
         economics=economics,
+        economics_sources=econ_sources,
         caveats=caveats,
     )
 

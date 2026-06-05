@@ -10,7 +10,16 @@ Architecture:
     Keyed by (lat_rounded, lon_rounded, kw_bucket, array_type) so nearby
     polygons of similar size share cache hits.
 
-PVWatts v8 docs: https://developer.nrel.gov/docs/solar/pvwatts/v8/
+Phase 6 addition: a pre-warmed solar grid (see scripts/warm_grid_solar.py
+and app/grid_solar.py) provides an instant fast-path. If the warmed grid
+has a polygon's cell+category, we use that per-kW yield scaled by system
+size — no network. On a miss, we fall through to the live PVWatts path
+below, unchanged.
+
+PVWatts v8 docs: https://developer.nlr.gov/docs/solar/pvwatts/v8/
+(NREL migrated developer.nrel.gov → developer.nlr.gov; old domain shut
+down 2026-05-29. If calls start failing with DNS errors, confirm the
+current host at the NREL developer portal.)
 """
 
 from __future__ import annotations
@@ -31,7 +40,7 @@ DATA_DIR = BACKEND_DIR / "data"
 CACHE_PATH = DATA_DIR / "pvwatts_cache.json"
 ENV_PATH = BACKEND_DIR / ".env"
 
-PVWATTS_URL = "https://developer.nrel.gov/api/pvwatts/v8.json"
+PVWATTS_URL = "https://developer.nlr.gov/api/pvwatts/v8.json"
 
 # Source tag for the response. Lets the frontend / caveats know which
 # generation source produced the numbers.
@@ -261,8 +270,14 @@ def pv_annual_mwh(
     """
     Return (annual MWh, source_tag) for a single polygon.
 
+    Resolution order:
+      1. Pre-warmed solar grid (instant, no network) — if it has the cell.
+      2. Per-key disk cache of live PVWatts results.
+      3. A live PVWatts call (then cached).
+      4. Fallback approximation (area × 0.15) if no key or on error.
+
     If no API key is configured, returns the fallback approximation.
-    If PVWatts call fails, logs and returns the fallback approximation —
+    If a PVWatts call fails, logs and returns the fallback approximation —
     so a transient network issue mid-run can't take down /analyze.
     """
     defaults = CATEGORY_DEFAULTS.get(category)
@@ -281,6 +296,20 @@ def pv_annual_mwh(
         # Parking canopies are typically flatter than roofs.
         tilt = min(tilt, 10.0)
 
+    # 1. Grid fast-path: if the pre-warmed solar grid has this cell+category,
+    #    use it (scaled by kW) — no network, instant. Falls through on a miss
+    #    or if the grid file doesn't exist, so behavior is unchanged until a
+    #    grid has been warmed by scripts/warm_grid_solar.py.
+    if system_kw > 0:
+        try:
+            from .grid_solar import lookup_annual_kwh
+            grid_kwh = lookup_annual_kwh(lat, lon, system_kw, category)
+        except Exception as e:  # never let the fast-path break the real path
+            logger.warning("grid lookup failed (%s); using live path", e)
+            grid_kwh = None
+        if grid_kwh is not None:
+            return grid_kwh / 1000.0, SOURCE_REAL
+
     if api_key is None or system_kw <= 0:
         # Fallback: rough 150 kWh/m² of panel per year. The OLD Phase-1
         # formula was area × 0.15 (without packing factor), which assumed
@@ -289,7 +318,7 @@ def pv_annual_mwh(
         fallback_mwh = area_m2 * 0.00015 * 1000  # area_m2 * 0.15 / 1000 = MWh
         return area_m2 * 0.15 / 1000.0, SOURCE_FALLBACK
 
-    # Check cache
+    # 2. Check the per-key disk cache.
     key = _cache_key(
         lat, lon, system_kw, defaults["array_type"],
         tilt, defaults["azimuth"], defaults["losses"],
@@ -298,7 +327,7 @@ def pv_annual_mwh(
     if cached is not None:
         return cached / 1000.0, SOURCE_REAL  # cache stores kWh; convert to MWh
 
-    # Call NREL
+    # 3. Call NREL.
     try:
         annual_kwh = _call_pvwatts(
             api_key,

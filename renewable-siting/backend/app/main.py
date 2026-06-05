@@ -11,17 +11,23 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from .affordability import compute_buildout, status as affordability_status
 from .pipeline import RegionNotFound, analyze
 from .polygons import source_status as polygons_status
 from .pvwatts import cache_stats, has_api_key
-from .regions import list_available, list_states, search
-from .schemas import AnalyzeRequest, AnalyzeResponse
+from .regions import RegionNotFound as _RNF, list_available, list_states, lookup, search
+from .schemas import (
+    AffordabilityRequest,
+    AffordabilityResponse,
+    AnalyzeRequest,
+    AnalyzeResponse,
+)
 
 
 app = FastAPI(
     title="Renewable Siting Tool",
-    description="Phase 4 — real polygons from Overture + OSM.",
-    version="0.4.0",
+    description="Phase 5 — affordability / realism estimate.",
+    version="0.5.0",
 )
 
 # Dev CORS: permissive for now. Lock down before any deploy.
@@ -101,3 +107,60 @@ def polygons_status_endpoint() -> dict:
     Overture stack is installed and how many regions are cached.
     """
     return polygons_status()
+
+
+@app.get("/affordability/status")
+def affordability_status_endpoint() -> dict:
+    """Diagnostic for the Phase 5 affordability model."""
+    return affordability_status()
+
+
+@app.post("/affordability", response_model=AffordabilityResponse)
+def affordability_endpoint(req: AffordabilityRequest) -> AffordabilityResponse:
+    """
+    Compute the low/high build-out + CO2 ranges for a region given budget
+    sliders. Lightweight — does NOT re-run the polygon/PVWatts pipeline.
+    The frontend calls this on slider changes.
+    """
+    try:
+        record = lookup(req.state, req.region_type, req.region_name)
+    except _RNF as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    result = compute_buildout(
+        record,
+        budget_dollars=req.budget_dollars,
+        allocation_pct=req.allocation_pct,
+        horizon_years=req.horizon_years,
+        capacity_factor=req.capacity_factor,
+        grid_co2_tons_per_mwh=req.grid_co2_tons_per_mwh,
+    )
+
+    if result is None:
+        return AffordabilityResponse(
+            available=False,
+            notes=["No budget data available for this region, and none was "
+                   "provided. Build the Phase 5 finance data or enter a "
+                   "budget manually."],
+        )
+
+    return AffordabilityResponse(
+        available=True,
+        installed_mw_low=result.installed_mw_low,
+        installed_mw_high=result.installed_mw_high,
+        annual_gwh_low=result.annual_gwh_low,
+        annual_gwh_high=result.annual_gwh_high,
+        co2_tons_per_year_low=result.co2_tons_per_year_low,
+        co2_tons_per_year_high=result.co2_tons_per_year_high,
+        co2_tons_cumulative_low=result.co2_tons_cumulative_low,
+        co2_tons_cumulative_high=result.co2_tons_cumulative_high,
+        budget_dollars=result.budget_dollars,
+        allocation_pct=result.allocation_pct,
+        horizon_years=result.horizon_years,
+        capacity_factor=result.capacity_factor,
+        grid_co2_tons_per_mwh=result.grid_co2_tons_per_mwh,
+        cost_per_watt_low=result.cost_per_watt_low,
+        cost_per_watt_high=result.cost_per_watt_high,
+        source=result.source,
+        notes=result.notes,
+    )

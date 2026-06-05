@@ -37,6 +37,20 @@ export async function getPolygonsStatus() {
   return r.json()
 }
 
+export async function getAffordability({ state, region_type, region_name,
+                                         allocation_pct, horizon_years,
+                                         budget_dollars }) {
+  const body = { state, region_type, region_name, allocation_pct, horizon_years }
+  if (budget_dollars != null) body.budget_dollars = budget_dollars
+  const r = await fetch(`${BASE}/affordability`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!r.ok) throw new Error(`POST /affordability ${r.status}`)
+  return r.json()
+}
+
 export async function analyze({ state, region_type, region_name }) {
   const r = await fetch(`${BASE}/analyze`, {
     method: 'POST',

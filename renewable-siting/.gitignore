@@ -29,3 +29,6 @@ backend/data/pvwatts_cache.json
 
 # Phase 4: polygon cache accumulates locally; not committed
 backend/data/polygon_cache/
+
+# Phase 5: finance Parquet files ARE committed (like the other data/*.parquet);
+# only the raw download is ignored (already covered by data/raw/ above).

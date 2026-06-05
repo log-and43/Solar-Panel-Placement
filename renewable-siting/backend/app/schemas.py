@@ -144,4 +144,49 @@ class AnalyzeResponse(BaseModel):
     polygons: PolygonCollection
     recommendation: Recommendation
     economics: Economics
+    # Phase 7: per-field provenance strings for the economics numbers.
+    # Optional so older callers/tests are unaffected.
+    economics_sources: Optional[dict] = None
     caveats: list[str]
+
+
+# ---------- Phase 5: affordability ----------
+
+class AffordabilityRequest(BaseModel):
+    state: str
+    region_type: Literal["county", "city"]
+    region_name: str
+    # Slider values
+    allocation_pct: float = Field(default=0.10, ge=0.0, le=1.0)
+    horizon_years: int = Field(default=20, ge=1, le=50)
+    # Optional overrides. If the frontend already has these from /analyze
+    # it can pass them so the budget number matches the rest of the page.
+    budget_dollars: Optional[float] = Field(default=None, ge=0.0)
+    capacity_factor: Optional[float] = Field(default=None, gt=0.0, le=1.0)
+    grid_co2_tons_per_mwh: Optional[float] = Field(default=None, ge=0.0)
+
+    @field_validator("state")
+    @classmethod
+    def _state_upper(cls, v: str) -> str:
+        return v.strip().upper()
+
+
+class AffordabilityResponse(BaseModel):
+    available: bool  # False when finance data isn't built / no budget found
+    installed_mw_low: Optional[float] = None
+    installed_mw_high: Optional[float] = None
+    annual_gwh_low: Optional[float] = None
+    annual_gwh_high: Optional[float] = None
+    co2_tons_per_year_low: Optional[float] = None
+    co2_tons_per_year_high: Optional[float] = None
+    co2_tons_cumulative_low: Optional[float] = None
+    co2_tons_cumulative_high: Optional[float] = None
+    budget_dollars: Optional[float] = None
+    allocation_pct: Optional[float] = None
+    horizon_years: Optional[int] = None
+    capacity_factor: Optional[float] = None
+    grid_co2_tons_per_mwh: Optional[float] = None
+    cost_per_watt_low: Optional[float] = None
+    cost_per_watt_high: Optional[float] = None
+    source: Optional[str] = None
+    notes: list[str] = []

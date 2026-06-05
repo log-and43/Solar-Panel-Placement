@@ -101,6 +101,23 @@ EIA_SEDS_USE = Source(
 )
 
 
+# ---- Census Annual Survey of State & Local Government Finances ----
+# Phase 5. State-level summary tables are the reliable backbone; county/place
+# coverage is partial and filled by population extrapolation downstream.
+
+CENSUS_GOV_FINANCE_STATE = Source(
+    name="census_gov_finance_state",
+    url="https://www2.census.gov/programs-surveys/state/tables/2022/2022_state_finances.csv",
+    description="State government finances summary, FY2022 (capital outlay etc.).",
+    where_to_find_if_broken=(
+        "https://www.census.gov/programs-surveys/gov-finances/data/datasets.html "
+        "→ Annual Survey of State Government Finances → latest year CSV. "
+        "Column names and the exact file path change year to year; update "
+        "the FINANCE_* parsing in build_data.py if the schema shifted."
+    ),
+)
+
+
 ALL_SOURCES: tuple[Source, ...] = (
     CENSUS_STATE_POP,
     CENSUS_COUNTY_POP,
@@ -109,4 +126,5 @@ ALL_SOURCES: tuple[Source, ...] = (
     CENSUS_GAZ_PLACES,
     EPA_EGRID,
     EIA_SEDS_USE,
+    CENSUS_GOV_FINANCE_STATE,
 )

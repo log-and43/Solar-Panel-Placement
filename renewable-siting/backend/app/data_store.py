@@ -43,10 +43,40 @@ def places_df() -> pd.DataFrame:
     return pd.read_parquet(_require(DATA_DIR / "places.parquet"))
 
 
+# ============================================================
+# Phase 5: government finance data (capital outlay budgets)
+# ============================================================
+
+@cache
+def finance_states_df() -> pd.DataFrame:
+    return pd.read_parquet(_require(DATA_DIR / "finance_states.parquet"))
+
+
+@cache
+def finance_counties_df() -> pd.DataFrame:
+    return pd.read_parquet(_require(DATA_DIR / "finance_counties.parquet"))
+
+
+@cache
+def finance_places_df() -> pd.DataFrame:
+    return pd.read_parquet(_require(DATA_DIR / "finance_places.parquet"))
+
+
 def data_available() -> bool:
-    """True iff all three Parquet files exist. Lets the app start gracefully
-    in Phase-1 mode if Phase 2 data hasn't been built yet."""
+    """True iff the core Phase-2 Parquet files exist. Lets the app start
+    gracefully in Phase-1 mode if Phase 2 data hasn't been built yet."""
     for name in ("states.parquet", "counties.parquet", "places.parquet"):
+        if not (DATA_DIR / name).exists():
+            return False
+    return True
+
+
+def finance_available() -> bool:
+    """True iff Phase-5 government-finance Parquet files exist. Phase 5
+    degrades independently of Phase 2 — the app still works without it,
+    just without the affordability panel."""
+    for name in ("finance_states.parquet", "finance_counties.parquet",
+                 "finance_places.parquet"):
         if not (DATA_DIR / name).exists():
             return False
     return True

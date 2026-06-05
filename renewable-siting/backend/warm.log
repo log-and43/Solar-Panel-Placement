@@ -1,0 +1,124 @@
+Building populated grid (0.1 deg, city-radius=0)...
+  5329 unique cells x 2 categories = 10658 reference calls.
+
+  0 (cell,category) pairs already cached; resuming.
+
+[50/5329 cells] made=100 skip=0 err=0 ~706/hr
+[100/5329 cells] made=200 skip=0 err=0 ~703/hr
+[150/5329 cells] made=300 skip=0 err=0 ~702/hr
+[200/5329 cells] made=400 skip=0 err=0 ~702/hr
+[250/5329 cells] made=500 skip=0 err=0 ~701/hr
+[300/5329 cells] made=600 skip=0 err=0 ~701/hr
+[350/5329 cells] made=700 skip=0 err=0 ~700/hr
+[400/5329 cells] made=800 skip=0 err=0 ~700/hr
+[450/5329 cells] made=900 skip=0 err=0 ~700/hr
+[500/5329 cells] made=1000 skip=0 err=0 ~700/hr
+[550/5329 cells] made=1100 skip=0 err=0 ~700/hr
+[600/5329 cells] made=1200 skip=0 err=0 ~700/hr
+[650/5329 cells] made=1300 skip=0 err=0 ~700/hr
+[700/5329 cells] made=1400 skip=0 err=0 ~700/hr
+[750/5329 cells] made=1500 skip=0 err=0 ~700/hr
+[800/5329 cells] made=1600 skip=0 err=0 ~700/hr
+[850/5329 cells] made=1700 skip=0 err=0 ~700/hr
+[900/5329 cells] made=1800 skip=0 err=0 ~700/hr
+[950/5329 cells] made=1900 skip=0 err=0 ~700/hr
+[1000/5329 cells] made=2000 skip=0 err=0 ~700/hr
+[1050/5329 cells] made=2100 skip=0 err=0 ~700/hr
+[1100/5329 cells] made=2200 skip=0 err=0 ~700/hr
+[1150/5329 cells] made=2300 skip=0 err=0 ~700/hr
+[1200/5329 cells] made=2400 skip=0 err=0 ~700/hr
+[1250/5329 cells] made=2500 skip=0 err=0 ~700/hr
+[1300/5329 cells] made=2600 skip=0 err=0 ~700/hr
+[1350/5329 cells] made=2700 skip=0 err=0 ~700/hr
+[1400/5329 cells] made=2800 skip=0 err=0 ~700/hr
+[1450/5329 cells] made=2900 skip=0 err=0 ~700/hr
+[1500/5329 cells] made=3000 skip=0 err=0 ~700/hr
+[1550/5329 cells] made=3100 skip=0 err=0 ~700/hr
+[1600/5329 cells] made=3200 skip=0 err=0 ~700/hr
+[1650/5329 cells] made=3300 skip=0 err=0 ~700/hr
+[1700/5329 cells] made=3400 skip=0 err=0 ~700/hr
+[1750/5329 cells] made=3500 skip=0 err=0 ~700/hr
+[1800/5329 cells] made=3600 skip=0 err=0 ~700/hr
+[1850/5329 cells] made=3700 skip=0 err=0 ~700/hr
+[1900/5329 cells] made=3800 skip=0 err=0 ~700/hr
+[1950/5329 cells] made=3900 skip=0 err=0 ~700/hr
+[2000/5329 cells] made=4000 skip=0 err=0 ~700/hr
+[2050/5329 cells] made=4100 skip=0 err=0 ~700/hr
+[2100/5329 cells] made=4200 skip=0 err=0 ~700/hr
+[2150/5329 cells] made=4300 skip=0 err=0 ~700/hr
+[2200/5329 cells] made=4400 skip=0 err=0 ~700/hr
+[2250/5329 cells] made=4500 skip=0 err=0 ~700/hr
+[2300/5329 cells] made=4600 skip=0 err=0 ~700/hr
+[2350/5329 cells] made=4700 skip=0 err=0 ~700/hr
+[2400/5329 cells] made=4800 skip=0 err=0 ~700/hr
+[2450/5329 cells] made=4900 skip=0 err=0 ~700/hr
+[2500/5329 cells] made=5000 skip=0 err=0 ~700/hr
+[2550/5329 cells] made=5100 skip=0 err=0 ~700/hr
+[2600/5329 cells] made=5200 skip=0 err=0 ~700/hr
+[2650/5329 cells] made=5300 skip=0 err=0 ~700/hr
+[2700/5329 cells] made=5400 skip=0 err=0 ~700/hr
+[2750/5329 cells] made=5500 skip=0 err=0 ~700/hr
+[2800/5329 cells] made=5600 skip=0 err=0 ~700/hr
+[2850/5329 cells] made=5700 skip=0 err=0 ~700/hr
+[2900/5329 cells] made=5800 skip=0 err=0 ~700/hr
+[2950/5329 cells] made=5900 skip=0 err=0 ~700/hr
+[3000/5329 cells] made=6000 skip=0 err=0 ~700/hr
+[3050/5329 cells] made=6100 skip=0 err=0 ~700/hr
+[3100/5329 cells] made=6200 skip=0 err=0 ~700/hr
+[3150/5329 cells] made=6300 skip=0 err=0 ~700/hr
+    39.8,-105.2 rooftop: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+    39.8,-105.2 parking: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+[3200/5329 cells] made=6398 skip=0 err=2 ~700/hr
+[3250/5329 cells] made=6498 skip=0 err=2 ~700/hr
+[3300/5329 cells] made=6598 skip=0 err=2 ~700/hr
+[3350/5329 cells] made=6698 skip=0 err=2 ~700/hr
+[3400/5329 cells] made=6798 skip=0 err=2 ~700/hr
+[3450/5329 cells] made=6898 skip=0 err=2 ~700/hr
+[3500/5329 cells] made=6998 skip=0 err=2 ~700/hr
+[3550/5329 cells] made=7098 skip=0 err=2 ~700/hr
+[3600/5329 cells] made=7198 skip=0 err=2 ~700/hr
+[3650/5329 cells] made=7298 skip=0 err=2 ~700/hr
+[3700/5329 cells] made=7398 skip=0 err=2 ~700/hr
+[3750/5329 cells] made=7498 skip=0 err=2 ~700/hr
+[3800/5329 cells] made=7598 skip=0 err=2 ~700/hr
+[3850/5329 cells] made=7698 skip=0 err=2 ~700/hr
+[3900/5329 cells] made=7798 skip=0 err=2 ~700/hr
+[3950/5329 cells] made=7898 skip=0 err=2 ~700/hr
+    41.7,-73.9 parking: network: The read operation timed out
+[4000/5329 cells] made=7997 skip=0 err=3 ~699/hr
+[4050/5329 cells] made=8097 skip=0 err=3 ~699/hr
+    41.9,-86.0 rooftop: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+    42.0,-91.6 rooftop: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+[4100/5329 cells] made=8195 skip=0 err=5 ~699/hr
+    42.1,-83.2 rooftop: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+[4150/5329 cells] made=8294 skip=0 err=6 ~699/hr
+[4200/5329 cells] made=8394 skip=0 err=6 ~699/hr
+[4250/5329 cells] made=8494 skip=0 err=6 ~699/hr
+    42.5,-71.1 parking: network: The read operation timed out
+[4300/5329 cells] made=8593 skip=0 err=7 ~699/hr
+[4350/5329 cells] made=8693 skip=0 err=7 ~699/hr
+[4400/5329 cells] made=8793 skip=0 err=7 ~699/hr
+[4450/5329 cells] made=8893 skip=0 err=7 ~699/hr
+[4500/5329 cells] made=8993 skip=0 err=7 ~699/hr
+[4550/5329 cells] made=9093 skip=0 err=7 ~699/hr
+[4600/5329 cells] made=9193 skip=0 err=7 ~699/hr
+[4650/5329 cells] made=9293 skip=0 err=7 ~699/hr
+[4700/5329 cells] made=9393 skip=0 err=7 ~699/hr
+[4750/5329 cells] made=9493 skip=0 err=7 ~699/hr
+[4800/5329 cells] made=9593 skip=0 err=7 ~699/hr
+[4850/5329 cells] made=9693 skip=0 err=7 ~699/hr
+[4900/5329 cells] made=9793 skip=0 err=7 ~699/hr
+[4950/5329 cells] made=9893 skip=0 err=7 ~699/hr
+[5000/5329 cells] made=9993 skip=0 err=7 ~699/hr
+[5050/5329 cells] made=10093 skip=0 err=7 ~699/hr
+[5100/5329 cells] made=10193 skip=0 err=7 ~699/hr
+[5150/5329 cells] made=10293 skip=0 err=7 ~699/hr
+[5200/5329 cells] made=10393 skip=0 err=7 ~699/hr
+    47.6,-118.4 rooftop: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+[5250/5329 cells] made=10492 skip=0 err=8 ~699/hr
+[5300/5329 cells] made=10592 skip=0 err=8 ~699/hr
+
+=== Summary ===
+  calls made: 10650  skipped: 0  errors: 8
+  elapsed:    15.24 hours
+  cache file: /home/logan/Documents/Solar-Panel-Placement/renewable-siting/backend/data/grid_solar_cache.parquet

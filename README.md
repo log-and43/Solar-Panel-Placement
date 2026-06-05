@@ -7,13 +7,16 @@ coastal regions — offshore wind, and reports the gap between current fossil
 generation and what renewables could cover, along with cost, payback, and
 CO₂ estimates.
 
-**Status: Phase 2 — real consumption data.** The /analyze pipeline now
-uses real consumption numbers from EIA SEDS + EPA eGRID + Census ACS for
-~3,000 US counties and ~3,000 cities (≥ 10,000 population). Polygons,
-cost estimates, and recommendation logic are still Phase 1 placeholders;
-they're scheduled for Phases 3, 4, 6, and 7. The API contract is unchanged.
+**Status: Phase 5 — affordability / realism estimate.** Given a region's
+capital budget (Census Annual Survey of Government Finances), an allocation
+slider, and a time horizon, the app estimates the low/high range of solar
+capacity that budget could build out and the CO2 it would displace — using
+NREL ATB cost trajectories for the range. This reframes the project from
+"what's technically possible" to "what's actually affordable." Phases 6
+(offshore wind / geothermal redesign) and 7 (polish) remain. The API
+contract is additive-only.
 
-See `docs/PHASE_2.md` for what to run to enable Phase 2 data.
+See `docs/PHASE_5.md` for setup. Prior phases in `docs/PHASE_*.md`.
 
 ## Why a walking skeleton first
 
@@ -90,3 +93,11 @@ npm run dev
 
 Open http://localhost:5173, pick WA → Whatcom County (or Bellingham), click Run.
 
+## Suggested initial commits
+
+1. `chore: scaffold backend + frontend + docs` — everything in this drop
+2. `docs: phase plan and API contract` — the docs/ files specifically
+3. `feat(backend): /analyze endpoint with Phase 1 fake data`
+4. `feat(frontend): region picker, map, diagnostic, caveats`
+
+Or just squash to one initial commit. Up to you.

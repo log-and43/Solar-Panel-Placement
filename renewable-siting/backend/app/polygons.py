@@ -229,7 +229,7 @@ def _fetch_overture_buildings(bbox: tuple[float, float, float, float]
             # semantics (any overlap), not strict containment, so we don't drop
             # buildings that straddle the bbox edge.
             query = f"""
-                SELECT ST_AsGeoJSON(ST_GeomFromWKB(geometry)) AS geom_json
+                SELECT ST_AsGeoJSON(geometry) AS geom_json
                 FROM read_parquet('{url}', filename=true, hive_partitioning=1)
                 WHERE
                     bbox.xmin < {east} AND bbox.xmax > {west}
@@ -237,8 +237,8 @@ def _fetch_overture_buildings(bbox: tuple[float, float, float, float]
                 LIMIT 5000
             """
             rows = con.execute(query).fetchall()
-            logger.info("Overture release %s returned %d buildings for bbox",
-                        release, len(rows))
+            logger.warning("Overture release %s returned %d buildings for bbox",
+                           release, len(rows))
             # We found a release that works. If it returned 0 rows for the
             # bbox, that's fine — it means the area genuinely has no Overture
             # buildings. Don't fall through to older releases (which would
@@ -253,8 +253,8 @@ def _fetch_overture_buildings(bbox: tuple[float, float, float, float]
             return out
         except Exception as e:
             last_err = e
-            logger.info("Overture release %s not available (%s); trying older",
-                        release, type(e).__name__)
+            logger.warning("Overture release %s not available (%s); trying older",
+                           release, type(e).__name__)
             continue
 
     con.close()

@@ -1,0 +1,12 @@
+{
+  "regions_done": 20,
+  "regions_total": 6282,
+  "total_polygons_seen": 8267,
+  "total_unique_keys": 6107,
+  "calls_made": 0,
+  "cache_hits": 0,
+  "errors": 0,
+  "elapsed_seconds": 143.0,
+  "last_region": "DeKalb County, AL",
+  "dry_run": true
+}

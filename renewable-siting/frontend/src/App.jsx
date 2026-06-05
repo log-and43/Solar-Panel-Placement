@@ -5,6 +5,7 @@ import TargetsPanel from './components/TargetsPanel.jsx'
 import LayersPanel from './components/LayersPanel.jsx'
 import ResultMap from './components/ResultMap.jsx'
 import Diagnostic from './components/Diagnostic.jsx'
+import Affordability from './components/Affordability.jsx'
 import DataQuality from './components/DataQuality.jsx'
 import ModelNotes from './components/ModelNotes.jsx'
 import { analyze } from './lib/api.js'
@@ -74,7 +75,7 @@ export default function App() {
       </aside>
 
       {/* Workspace */}
-      <main className="grid grid-rows-[auto_minmax(420px,1fr)_auto_auto_auto] gap-4 p-5">
+      <main className="grid grid-rows-[auto_minmax(420px,1fr)_auto_auto_auto_auto] gap-4 p-5">
         {/* Topbar */}
         <header className="flex justify-between items-center gap-5">
           <div>
@@ -104,6 +105,9 @@ export default function App() {
 
         {/* Diagnostic strip */}
         <Diagnostic result={result} energyTargetGwh={energyTargetGwh} />
+
+        {/* Phase 5: affordability / realism estimate */}
+        <Affordability result={result} />
 
         {/* Data quality: generation mix + caveats side-by-side */}
         <DataQuality result={result} />

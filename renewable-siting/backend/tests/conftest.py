@@ -45,14 +45,21 @@ def _disable_pvwatts_network(monkeypatch, tmp_path):
     delete the env vars and they'll naturally see SOURCE_FALLBACK
     without hitting the network anyway.
     """
+    import os
     import app.pvwatts as pvw
 
     # Per-test isolated cache file so tests don't pollute each other.
     fresh_cache = pvw._Cache(tmp_path / "pv_cache.json")
     monkeypatch.setattr(pvw, "_cache", fresh_cache)
 
-    # Block any unmocked PVWatts call. If a test wants to exercise the
-    # success path, it overrides this with its own _call_pvwatts mock.
+    # If the developer explicitly opted into live PVWatts testing, do NOT
+    # block the network — that's the whole point of the live test.
+    if os.environ.get("PVWATTS_LIVE_TEST") == "1":
+        yield
+        return
+
+    # Otherwise block any unmocked PVWatts call. If a test wants to exercise
+    # the success path, it overrides this with its own _call_pvwatts mock.
     def _no_network(*args, **kwargs):
         raise pvw.PVWattsError("Network blocked in tests; mock _call_pvwatts to exercise success path.")
     monkeypatch.setattr(pvw, "_call_pvwatts", _no_network)
