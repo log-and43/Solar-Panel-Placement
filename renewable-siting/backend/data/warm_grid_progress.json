@@ -1,8 +1,8 @@
 {
-  "cells_done": 5300,
-  "cells_total": 5329,
-  "calls_made": 10592,
+  "cells_done": 15700,
+  "cells_total": 15711,
+  "calls_made": 31399,
   "skipped": 0,
-  "errors": 8,
-  "elapsed_seconds": 54567.0
+  "errors": 1,
+  "elapsed_seconds": 22668.0
 }
