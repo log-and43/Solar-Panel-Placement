@@ -16,8 +16,6 @@ export default function TargetsPanel({
   setEnergyTargetGwh,
   avoidAgriculture,
   setAvoidAgriculture,
-  includeOcean,
-  setIncludeOcean,
   defaultFossilGwh,
 }) {
   return (
@@ -41,16 +39,6 @@ export default function TargetsPanel({
         <span className="text-[11px] text-muted mt-1 block">
           Leave blank to use the region's full fossil generation.
         </span>
-      </label>
-
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={includeOcean}
-          onChange={(e) => setIncludeOcean(e.target.checked)}
-          className="w-4 h-4 accent-rooftop"
-        />
-        <span>Include offshore zones (coastal regions only)</span>
       </label>
 
       <label className="flex items-center gap-2 text-sm opacity-50 cursor-not-allowed" title="Will be wired up in Phase 6">

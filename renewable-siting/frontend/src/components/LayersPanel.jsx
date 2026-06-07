@@ -4,7 +4,6 @@
 const LAYERS = [
   { key: 'rooftop',            label: 'Rooftops',           swatch: 'bg-rooftop' },
   { key: 'parking',            label: 'Parking lots',       swatch: 'bg-parking' },
-  { key: 'offshore_wind_zone', label: 'Offshore wind',      swatch: 'bg-wind' },
   { key: 'cv_detected_parking',label: 'CV-detected parking',swatch: 'bg-ocean', phase: 5 },
 ]
 

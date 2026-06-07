@@ -13,7 +13,6 @@ import { analyze } from './lib/api.js'
 const DEFAULT_LAYERS = new Set([
   'rooftop',
   'parking',
-  'offshore_wind_zone',
   'cv_detected_parking',
 ])
 
@@ -24,14 +23,10 @@ export default function App() {
 
   // New controls borrowed (and re-grounded) from the Codex frontend.
   const [energyTargetGwh, setEnergyTargetGwh] = useState(null)  // null = use region's full fossil
-  const [includeOcean, setIncludeOcean] = useState(true)
   const [avoidAgriculture, setAvoidAgriculture] = useState(false)  // wired in Phase 6
   const [visibleLayers, setVisibleLayers] = useState(DEFAULT_LAYERS)
 
-  // The "include ocean" toggle is a quick filter on top of the layer toggles.
-  const effectiveVisible = includeOcean
-    ? visibleLayers
-    : new Set([...visibleLayers].filter(l => l !== 'offshore_wind_zone'))
+  const effectiveVisible = visibleLayers
 
   async function handleRun(req) {
     setRunning(true)
@@ -61,8 +56,6 @@ export default function App() {
         <TargetsPanel
           energyTargetGwh={energyTargetGwh}
           setEnergyTargetGwh={setEnergyTargetGwh}
-          includeOcean={includeOcean}
-          setIncludeOcean={setIncludeOcean}
           avoidAgriculture={avoidAgriculture}
           setAvoidAgriculture={setAvoidAgriculture}
           defaultFossilGwh={defaultFossilGwh}

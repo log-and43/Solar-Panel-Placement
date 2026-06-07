@@ -4,7 +4,6 @@ import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 const STYLES = {
   rooftop:             { color: '#67d391', weight: 1, fillColor: '#67d391', fillOpacity: 0.55 },
   parking:             { color: '#f5c45b', weight: 1, fillColor: '#f5c45b', fillOpacity: 0.55 },
-  offshore_wind_zone:  { color: '#6ea2ff', weight: 1.5, fillColor: '#6ea2ff', fillOpacity: 0.32, dashArray: '6 4' },
   cv_detected_parking: { color: '#53c7df', weight: 1, fillColor: '#53c7df', fillOpacity: 0.55 },
 }
 
@@ -84,7 +83,6 @@ export default function ResultMap({ result, visibleLayers }) {
       <div className="absolute bottom-3 left-3 bg-panel/95 border border-line rounded-md px-3 py-2 text-[11px] space-y-1 z-[500]">
         <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm bg-rooftop" /> Rooftop</div>
         <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm bg-parking" /> Parking</div>
-        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm bg-wind" /> Offshore wind</div>
       </div>
     </div>
   )
