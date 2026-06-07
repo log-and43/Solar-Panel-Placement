@@ -60,21 +60,21 @@ cd Solar-Panel-Placement/renewable-siting
 #### Linux / macOS
 
 ```bash
-cd backend
+cd Solar-Panel-Placement/renewable-siting/backend
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
 pip install -r requirements.txt
+python3 scripts/build_data.py
 ```
 
 #### Windows (PowerShell)
 
 ```powershell
-cd backend
+cd Solar-Panel-Placement\renewable-siting\backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
 pip install -r requirements.txt
+python scripts\build_data.py
 ```
 
 > If PowerShell blocks the activate script ("running scripts is disabled"),
